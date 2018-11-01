@@ -1,7 +1,10 @@
 import matplotlib.pyplot as plt
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> parent of 9682573... Update plot.py
 x=[0,1,1]
 y=[1,1,0]
 
