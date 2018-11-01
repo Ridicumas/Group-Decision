@@ -1,2 +1,2 @@
 # Group-Decision
-a simulate of group judgment
+a simulation of group judgment
