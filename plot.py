@@ -1,3 +1,6 @@
+
+
+
 import matplotlib.pyplot as plt
 x=[0,1,1]
 y=[1,1,0]
