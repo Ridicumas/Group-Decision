@@ -1,4 +1,4 @@
-﻿import random,time,datetime,subprocess
+﻿import random,time,datetime,subprocess,json
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm as nm
@@ -153,9 +153,18 @@ filename=str("individual("+
              "_dc_"+str(dc)+
              "_"+str(a.trail)+
              ").txt")
+filename_j=str("individual("+
+               "ud_"+str(ud)+
+               "_dd_"+str(dd)+
+              #"_uc_"+str(uc)+
+               "_dc_"+str(dc)+
+               "_"+str(a.trail)+
+               ").json")
 with open(filename,'a') as file_object:
     file_object.write(out_f)
     file_object.write(out_h)
+with open(filename_j,'a') as f_obj:
+    json.dump([f,h],f_obj)
 
 end_time="End time: "+time.strftime("%Y-%m-%d %H:%M:%S")#结束时间
 timer_end=datetime.datetime.now()#计时器结束计时

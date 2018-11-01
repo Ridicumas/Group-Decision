@@ -1,4 +1,4 @@
-import random,time,datetime,subprocess
+import random,time,datetime,subprocess,json
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm as nm
@@ -239,16 +239,26 @@ class Group():
         #print(h)
 
         filename=str("group_"+
-                str(self.group)+"("+
-                str(self.member)+","+
-                str(self.rule)+","+
-                str(self.trail)+")_memberud_"+
-                str(self.member_ud)+"_memberdd_"+
-                str(self.member_dd)+"_memberdc_"+
-                str(self.member_dc)+".txt")
+                 str(self.group)+"("+
+                 str(self.member)+","+
+                 str(self.rule)+","+
+                 str(self.trail)+")_memberud_"+
+                 str(self.member_ud)+"_memberdd_"+
+                 str(self.member_dd)+"_memberdc_"+
+                 str(self.member_dc)+".txt")
+        filename_j=str("group_"+
+                   str(self.group)+"("+
+                   str(self.member)+","+
+                   str(self.rule)+","+
+                   str(self.trail)+")_memberud_"+
+                   str(self.member_ud)+"_memberdd_"+
+                   str(self.member_dd)+"_memberdc_"+
+                   str(self.member_dc)+".json")
         with open(filename,'a') as file_object:
             file_object.write(f)
             file_object.write(h)
+        with open(filename_j,'a') as f_obj:
+            json.dump([self.f,self.h],f_obj)
         
             
 
