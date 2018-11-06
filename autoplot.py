@@ -7,16 +7,21 @@ plt.xlim((0,1))
 plt.ylim((0,1))
 plt.xlabel("false alarm rate",fontsize=14)
 plt.ylabel("hit rate",fontsize=14)
+x=[0,1]
+y=[0,1]
+plt.plot(x,y,linewidth=1,color='black')
 
 #输入需绘制的individual曲线
 file_name=[]
 curve_name=[]
 f=[]
 h=[]
+figure_name=""
 a=input("Do you want to plot individual performance?Y/N\n")
 if a.upper()=='Y':
     n=input("How many individuals do you want to plot?\n")
     n=int(n)
+    figure_name+="ind"
     for i in range(1,n+1):
         print(f"INDIVIDUAL{i}:")
         ud=input("ud:")
@@ -30,12 +35,14 @@ if a.upper()=='Y':
         file_name_i=f"individual(ud_{ud}_dd_{dd}_dc_{dc}_{t}).json"
         file_name.append(file_name_i)
         curve_name.append(curve_name_i)
-
+        figure_name+=f"_({ud},{dd},{dc})"
+        
 #输入需绘制的group曲线
 a=input("Do you want to plot group performance?Y/N\n")
 if a.upper()=='Y':
     n=input("How many groups do you want to plot?\n")
     n=int(n)
+    figure_name+="group"
     for i in range(1,n+1):
         print(f"GROUP{i}:")
         c_num=input("group class(1.simple majority,2.information cascade):")
@@ -56,6 +63,8 @@ if a.upper()=='Y':
         file_name_i=f"group_{c}({m},{r},{t})_memberud_{ud}_memberdd_{dd}_memberdc_{dc}.json"
         file_name.append(file_name_i)
         curve_name.append(curve_name_i)
+        figure_name+=f"_{c}({m},{r}_{ud},{dd},{dc})"
+figure_name+=".png"
 
 #绘制曲线
 n=len(file_name)
@@ -74,4 +83,5 @@ plt.legend(handles=l,
            labels=curve_name,
            fontsize=14,
            loc='best')
+plt.savefig(figure_name,box_inches='tight')
 plt.show()
