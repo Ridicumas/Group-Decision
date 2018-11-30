@@ -1,4 +1,4 @@
-import random,time,datetime,subprocess,json
+import random,time,datetime,subprocess,json,os,csv
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm as nm
@@ -19,6 +19,8 @@ class Group():
         self.hit=0
         self.h=[]
         self.f=[]
+        self.cl=[]
+        self.dp=[]
 
     def set_c(self,min_c,max_c):#设置c值范围
         self.c=[]
@@ -80,6 +82,17 @@ class Group():
                     self.false+=1
             h=self.hit/self.s
             f=self.false/self.n
+            l=-nm.ppf(f)
+            dp=nm.ppf(h)-nm.ppf(f)
+            #计算对应的d'以及lambda
+            if f==0 or f==1 or h==0 or h==1:
+                dp='-'
+                l='-'
+            elif f!=0 and h!=0 and f!=1 and h!=1:
+                l=-nm.ppf(f)
+                dp=nm.ppf(h)-nm.ppf(f)
+            self.dp.append(dp)
+            self.cl.append(l)
             self.h.append(h)
             self.f.append(f)
             #print(t,"/",len(self.c))#显示进度
@@ -186,13 +199,27 @@ class Group():
                     self.false+=1
             h=self.hit/self.s
             f=self.false/self.n
+            l=-nm.ppf(f)
+            dp=nm.ppf(h)-nm.ppf(f)
+            #计算对应的d'以及lambda
+            if f==0 or f==1 or h==0 or h==1:
+                dp='-'
+                l='-'
+            elif f!=0 and h!=0 and f!=1 and h!=1:
+                l=-nm.ppf(f)
+                dp=nm.ppf(h)-nm.ppf(f)
             self.h.append(h)
             self.f.append(f)
+            self.dp.append(dp)
+            self.cl.append(l)
             #print(t,"/",len(self.c))#显示进度
             pbar.update(10*t+1)
             t+=1
         pbar.finish()
         self.outport_fh()
+
+
+        
 
     def outport_fh(self):
         self.member_ud=int(self.member_ud*100)
@@ -235,20 +262,29 @@ class Group():
                    str(self.member_ud)+"_memberdd_"+
                    str(self.member_dd)+"_memberdc_"+
                    str(self.member_dc)+".json")
+        filename_c=str("group_"+
+                   str(self.group)+"("+
+                   str(self.member)+","+
+                   str(self.rule)+","+
+                   str(self.trail)+")_memberud_"+
+                   str(self.member_ud)+"_memberdd_"+
+                   str(self.member_dd)+"_memberdc_"+
+                   str(self.member_dc)+".csv")
         with open(filename,'a') as file_object:
             file_object.write(f)
             file_object.write(h)
         with open(filename_j,'a') as f_obj:
             json.dump([self.f,self.h],f_obj)
+        num=len(self.f)
+        with open(filename_c,"w",newline="") as datacsv:
+            csvwriter = csv.writer(datacsv,dialect = ("excel"))
+            csvwriter.writerow(["c","false alarm rate","hit rate","d'","l"])
+            for i in range(0,num):
+                csvwriter.writerow([self.c[i],self.f[i],self.h[i],self.dp[i],self.cl[i]])
+            
         
-            
 
             
-            
-
-
-
-
 
 
 class GroupMember():
