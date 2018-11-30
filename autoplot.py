@@ -9,7 +9,7 @@ plt.xlabel("false alarm rate",fontsize=14)
 plt.ylabel("hit rate",fontsize=14)
 x=[0,1]
 y=[0,1]
-plt.plot(x,y,linewidth=1,color='black')
+plt.plot(x,y,linewidth=1,color='black',linestyle='--')
 
 #输入需绘制的individual曲线
 file_name=[]
