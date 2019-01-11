@@ -21,6 +21,11 @@ class Group():
         self.f=[]
         self.cl=[]
         self.dp=[]
+        self.ic_d=[]
+        self.ic=[]
+        self.g_d=[]
+        self.m_d=[]
+        self.cascade_number=[]
 
     def set_c(self,min_c,max_c):#设置c值范围
         self.c=[]
@@ -113,6 +118,12 @@ class Group():
             self.s=0
             self.n=0
             n=self.trail
+            ic_number=0
+            g_d=0
+            m_d=0
+            ic=[]
+            ic_d=[]
+            cascade_number=0
             #member=GroupMember(0,0,0,0)
             while n>0:
                 n-=1#一次trail
@@ -122,13 +133,16 @@ class Group():
                 member_false=0
                 member_adopt=0
                 member_reject=0
+                go=0
+                ic_member=0
                 #print(self.sig,"\n")#正式运行需注释
-                while i>0:
+                while i>0:#每一个成员的操作
                     i-=1
                     member=GroupMember(self.member_ud,self.member_dd,c,self.member_dc)
                     member.set_member()
                     member.f_and_h()
                     group_d=member_adopt-member_reject
+                    groupd=[]
                     #print(group_d)#正式运行需注释
                     if self.sig==1:
                         if group_d>1:
@@ -192,11 +206,27 @@ class Group():
                         elif group_d<-1:
                             member_false+=1
                             member_reject+=1
+                    groupd.append(group_d)
+                    if group_d>1 and go==0:
+                        go=1
+                        ic_member=self.member-i
+                        cascade_number+=1
+                g_d+=group_d
+                m_d+=ic_member
+                ic.append(ic_member)#本次trail中information cascade发生的时机   
+                ic_d.append(groupd)#本次trail的所有d（information cascade标准）
                 r=self.rule
                 if member_hit>=r:
                     self.hit+=1
                 elif member_false>=r:
                     self.false+=1
+            g_d=g_d/cascade_number
+            m_d=m_d/cascade_number
+            self.cascade_number.append(cascade_number)
+            self.g_d.append(g_d)
+            self.m_d.append(m_d)
+            self.ic.append(ic)#所有information cascade发生的时机（二维数组）
+            self.ic_d.append(ic_d)#所有d（三维数组）
             h=self.hit/self.s
             f=self.false/self.n
             l=-nm.ppf(f)
@@ -218,7 +248,10 @@ class Group():
         pbar.finish()
         self.outport_fh()
 
-
+    def calcu_ic(self):#处理information cascade的各个特征
+        n=len(self.ic_d[0])
+        m=len(self.ic_d)
+        
         
 
     def outport_fh(self):
@@ -262,6 +295,14 @@ class Group():
                    str(self.member_ud)+"_memberdd_"+
                    str(self.member_dd)+"_memberdc_"+
                    str(self.member_dc)+".json")
+        filename_jdp=str("group_"+
+                     str(self.group)+"(d')_("+
+                     str(self.member)+","+
+                     str(self.rule)+","+
+                     str(self.trail)+")_memberud_"+
+                     str(self.member_ud)+"_memberdd_"+
+                     str(self.member_dd)+"_memberdc_"+
+                     str(self.member_dc)+".json")
         filename_c=str("group_"+
                    str(self.group)+"("+
                    str(self.member)+","+
@@ -270,6 +311,14 @@ class Group():
                    str(self.member_ud)+"_memberdd_"+
                    str(self.member_dd)+"_memberdc_"+
                    str(self.member_dc)+".csv")
+        filename_cdp=str("group_"+
+                     str(self.group)+"(preprocessed)_("+
+                     str(self.member)+","+
+                     str(self.rule)+","+
+                     str(self.trail)+")_memberud_"+
+                     str(self.member_ud)+"_memberdd_"+
+                     str(self.member_dd)+"_memberdc_"+
+                     str(self.member_dc)+".csv")
         with open(filename,'a') as file_object:
             file_object.write(f)
             file_object.write(h)
@@ -278,13 +327,46 @@ class Group():
         num=len(self.f)
         with open(filename_c,"w",newline="") as datacsv:
             csvwriter = csv.writer(datacsv,dialect = ("excel"))
-            csvwriter.writerow(["c","false alarm rate","hit rate","d'","l"])
-            for i in range(0,num):
-                csvwriter.writerow([self.c[i],self.f[i],self.h[i],self.dp[i],self.cl[i]])
+            if self.group=='sm':
+                csvwriter.writerow(["c","false alarm rate","hit rate","d'","l"])
+                for i in range(0,num):
+                    csvwriter.writerow([self.c[i],self.f[i],self.h[i],self.dp[i],self.cl[i]])
+            elif self.group=='ic':
+                csvwriter.writerow(["c","false alarm rate","hit rate","d'","l",
+                                    "d(mean)","cascade time","cascade number","trail",
+                                    "P(cascade)"])
+                for i in range(0,num):
+                    csvwriter.writerow([self.c[i],self.f[i],self.h[i],self.dp[i],self.cl[i],
+                                        self.g_d[i],self.m_d[i],self.cascade_number[i],
+                                        self.trail,self.cascade_number[i]/self.trail])
+        c=[]
+        dp=[]
+        with open(filename_cdp,"w",newline="") as datacsv:
+            csvwriter = csv.writer(datacsv,dialect = ("excel"))
+            if self.group=='sm':
+                csvwriter.writerow(["c","false alarm rate","hit rate","d'","l"])
+                for i in range(0,num):
+                    if self.dp[i]!='-':
+                        if self.dp[i]>0.00001:
+                           csvwriter.writerow([self.c[i],self.f[i],self.h[i],self.dp[i],self.cl[i]])
+                           c.append(self.c[i])
+                           dp.append(self.dp[i])
+            elif self.group=='ic':
+                csvwriter.writerow(["c","false alarm rate","hit rate","d'","l",
+                                    "d(mean)","cascade time","cascade number","trail",
+                                    "P(cascade)"])
+                for i in range(0,num):
+                    if self.dp[i]!='-':
+                        if self.dp[i]>0.00001:
+                            csvwriter.writerow([self.c[i],self.f[i],self.h[i],self.dp[i],self.cl[i],
+                                                self.g_d[i],self.m_d[i],self.cascade_number[i],
+                                                self.trail,self.cascade_number[i]/self.trail])
+                            c.append(self.c[i])
+                            dp.append(self.dp[i])
+        with open(filename_jdp,'a') as f_obj:
+            json.dump([c,dp],f_obj)
             
-        
-
-            
+           
 
 
 class GroupMember():
