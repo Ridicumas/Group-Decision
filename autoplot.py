@@ -45,25 +45,31 @@ if a.upper()=='Y':
     figure_name+="group"
     for i in range(1,n+1):
         print(f"GROUP{i}:")
-        c_num=input("group class(1.simple majority,2.information cascade):")
+        c_num=input("group class(1.simple majority,2.information cascade,3.algorithm):")
         if c_num=='1':
             c='sm'
         elif c_num=='2':
             c='ic'
+        elif c_num=='3':
+            c='al'
         m=input("member:")
         r=input("rule:")
         ud=input("member ud:")
         dd=input("member dd:")
         dc=input("member dc:")
-        t=input("trail:")
-        curve_name_i=f"group_{c}({m},{r},{t})_member({ud},{dd},{dc})"
-        ud=int(float(ud)*100)
-        dd=int(float(dd)*100)
-        dc=int(float(dc)*100)
-        file_name_i=f"group_{c}({m},{r},{t})_memberud_{ud}_memberdd_{dd}_memberdc_{dc}.json"
+        ud_f=int(float(ud)*100)
+        dd_f=int(float(dd)*100)
+        dc_f=int(float(dc)*100)
+        if c!='al':
+            t=input("trail:")
+            curve_name_i=f"group_{c}({m},{r},{t})_member({ud},{dd},{dc})"
+            file_name_i=f"group_{c}({m},{r},{t})_memberud_{ud_f}_memberdd_{dd_f}_memberdc_{dc_f}.json"
+        elif c=='al':
+            curve_name_i=f"group_{c}({m},{r})_member({ud},{dd},{dc})"
+            file_name_i=f"group_{c}({m},{r})_memberud_{ud_f}_memberdd_{dd_f}_memberdc_{dc_f}.json"
         file_name.append(file_name_i)
         curve_name.append(curve_name_i)
-        figure_name+=f"_{c}({m},{r}_{ud},{dd},{dc})"
+        figure_name+=f"_{c}({m},{r}_{ud_f},{dd_f},{dc_f})"
 figure_name+=".png"
 
 #绘制曲线
