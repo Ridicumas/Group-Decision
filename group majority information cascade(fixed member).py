@@ -46,11 +46,11 @@ class Group():
         n=self.member
         while n>0:
             #生成每个成员的di,ci
-            di=member_ud+member_dd*(1-2*n/self.member)
-            ci=member_dc*(1-2*n/self.member)
+            n-=1
+            di=member_ud+member_dd*(1-2*n/(self.member-1))
+            ci=member_dc*(1-2*n/(self.member-1))
             self.member_di.append(di)
             self.member_ci.append(ci)
-            n-=1
         for c in self.c:
             dixi=[]#所有成员的di和xi
             n=self.member
